@@ -1,4 +1,11 @@
 {
     "sciResortName": "Bukovel",
-    "population": 10
+    "mountainsName": "Carpatians",
+    "slopes": {
+        "firstSlope": {
+            "slopeName": "A2",
+            "slopeTime": 180,
+            "slopePoints": [[32, 323], [4.3, 23]]
+        }
+    }
 }

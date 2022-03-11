@@ -6,11 +6,12 @@ import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/exampl
 import dat from "https://cdn.skypack.dev/dat.gui";
 
 
-
-// // Ski resort data
-// const skiResortData = require("./sciResortData.json")
-// console.log(skiResortData)
-
+// Ski resort data
+const skiResortData = {
+    "sciResortName": "Bukovel",
+    "sciResortWidth": 1000,
+    "sciResortHeight": 1000
+}
 
 const mapCanvas = document.getElementById("mapCanvas");
 
@@ -21,9 +22,9 @@ const mapCanvasSize = {
 
 const cameraControlsPoints = {
     cameraPosition: {
-        cameraPositionX: 2,
+        cameraPositionX: 0,
         cameraPositionY: 1000,
-        cameraPositionZ: 1000
+        cameraPositionZ: 0
     },
 
     cameraFocalPointPosition: {
@@ -34,7 +35,6 @@ const cameraControlsPoints = {
 };
 
 
-
 // Loaders
 // Texture loader
 const textureLoader = new THREE.TextureLoader().setPath("./img/textures/")
@@ -42,21 +42,21 @@ const mountainsTexture = textureLoader.load("mountainsTexture.png")
 
 // Height maps loader
 const heightMapLoader = new THREE.TextureLoader().setPath("./img/heightMaps/")
-const heightMap = heightMapLoader.load("heightMap.png")
+const heightMap = heightMapLoader.load("heightMap2.png")
 const heightMap1 = heightMapLoader.load("heightMap1.png")
 
 // Normal map loader
 const normalMapLoader = new THREE.TextureLoader().setPath("./img/normalMaps/")
-const mountainsNormalMapTexture = normalMapLoader.load("mountainsNormalMap.png")
+const mountainsNormalMapTexture = normalMapLoader.load("mountainsNormalMap1.png")
 
 // Cube texture loader
 const cubeTextureLoader = new THREE.CubeTextureLoader().setPath("./img/backgroundCubeTextures/");
-const backgroundCubeTextures = cubeTextureLoader.load(["firstSkybox/firstSkyboxNX.jpg", 
-                                                       "firstSkybox/firstSkyboxNY.jpg",
-                                                       "firstSkybox/firstSkyboxNZ.jpg",
-                                                       "firstSkybox/firstSkyboxPX.jpg",
-                                                       "firstSkybox/firstSkyboxPY.jpg", 
-                                                       "firstSkybox/firstSkyboxPZ.jpg"]);
+const backgroundCubeTextures = cubeTextureLoader.load(["firstSkybox/firstSkyboxLEFT.jpg", 
+                                                       "firstSkybox/firstSkyboxRIGHT.jpg",
+                                                       "firstSkybox/firstSkyboxUP.jpg",
+                                                       "firstSkybox/firstSkyboxDOWN.jpg",
+                                                       "firstSkybox/firstSkyboxBACKWARD.jpg", 
+                                                       "firstSkybox/firstSkyboxFORWARD.jpg"]);
 
 
 
@@ -87,12 +87,12 @@ scene.add(mainCamera);
 // Controls
 const controls = new OrbitControls(mainCamera, mapCanvas);
 controls.enableDamping = true;
-controls.dampingFactor = 0.07;
+controls.dampingFactor = 0.05;
 controls.maxPolarAngle = convertDegreesToRadians(75);
 
 
 // Lights
-const pointLight = new THREE.PointLight()
+const pointLight = new THREE.RectAreaLight()
 pointLight.position.set(0, 5000, 0);
 pointLight.lookAt(0, 0, 0)
 pointLight.intensity = 1
@@ -106,11 +106,12 @@ const planeGeometry = new THREE.PlaneGeometry(10000, 10000, 1000, 1000);
 
 // Materials
 const planeMaterial = new THREE.MeshStandardMaterial({
-    color: new THREE.Color(0xFFFFFF),
+    color: new THREE.Color(0xffedfb),
     displacementMap: heightMap,
     displacementScale: 1000,
     normalMap: mountainsNormalMapTexture,
-    // map: heightMap,
+    roughness: 1,
+    map: heightMap,
     side: THREE.DoubleSide
 });
 
@@ -129,16 +130,16 @@ heightMapSettings.add(planeMaterial, "displacementScale", 0, 4000)
 // heightMapSettings.add(planeMaterial, "displacementMap", )
 
 const lightSettings = GUI.addFolder("Light settings")
-lightSettings.add(pointLight.position, "x").min(-10000).max(10000).step(0.01);
-lightSettings.add(pointLight.position, "z").min(-10000).max(10000).step(0.01);
+lightSettings.add(pointLight.position, "x").min(0).max(10000).step(0.01);
+lightSettings.add(pointLight.position, "z").min(0).max(10000).step(0.01);
 lightSettings.add(pointLight.position, "y").min(0).max(5000).step(0.01);
-lightSettings.add(pointLight, "intensity").min(0).max(10).step(0.005);
+lightSettings.add(pointLight, "intensity").min(0).max(1000).step(0.05);
 
 
 
 // Helpers 
-const pointLightHelper = new THREE.PointLightHelper(pointLight, 1);
-scene.add(pointLightHelper);
+// const pointLightHelper = new THREE.RectAreaLightHelper(pointLight, 1);
+// scene.add(pointLightHelper);
 
 
 // Window resize handle
@@ -160,7 +161,8 @@ window.addEventListener('resize', () =>
 
 // Renderer setup
 const renderer = new THREE.WebGLRenderer({
-    canvas: mapCanvas
+    canvas: mapCanvas,
+    antiAliasing: true
 })
 renderer.setSize(mapCanvasSize.mapCanvasWidth, mapCanvasSize.mapCanvasHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
